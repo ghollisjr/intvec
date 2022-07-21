@@ -93,3 +93,41 @@
 (defun make-full-intvec (length)
   "Returns completely filled intvec of given length"
   (1- (ash 1 length)))
+
+(defun tests ()
+  "Run a suite of tests for intvec API"
+  ;; complete removal test
+  (assert (= 0
+             (let ((intvec (make-full-intvec 8)))
+               (do-intvec (i intvec intvec)
+                 (setf intvec
+                       (intvec-remove intvec i))))))
+  ;; complete insertion test
+  (assert (= (1- (ash 1 8))
+             (let ((intvec 0))
+               (dotimes (i 8 intvec)
+                 (setf intvec
+                       (intvec-insert intvec i))))))
+  ;; randomized negative insertion ignored
+  (dotimes (i 100)
+    (assert (let* ((x (random (ash 1 32))))
+              (= x
+                 (intvec-insert x (- x))))))
+  ;; randomized 32-bit negative removal ignored
+  (dotimes (i 100)
+    (assert (let* ((x (random (ash 1 32))))
+              (= x
+                 (intvec-remove x (- x))))))
+  ;; randomized 64-bit insertion size check
+  (dotimes (j 100)
+    (assert (let* ((max-size 64)
+                   (ninsert 0)
+                   (intvec 0))
+              (dotimes (i max-size)
+                (when (zerop (random 2))
+                  (incf ninsert)
+                  (setf intvec
+                        (intvec-insert intvec i))))
+              (= (intvec-size intvec)
+                 ninsert))))
+  T)
