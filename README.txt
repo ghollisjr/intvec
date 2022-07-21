@@ -43,7 +43,6 @@ sequence as would be seen by any other sequence.
 
 ;; Make a string representation with the same bit-ordering as other
 ;; sequences:
-
 (map 'string
      (lambda (i) (character (princ-to-string i)))
      (intvec->sequence 'list *vec*))
